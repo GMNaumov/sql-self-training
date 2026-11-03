@@ -1,0 +1,15 @@
+/* Запросы после processing; используйте их для сверки и проверки ролей. */
+/* 1. Простой: общий контрольный итог куба. */
+SELECT {[Measures].[Internet Sales Amount]} ON COLUMNS
+FROM [Adventure Works];
+
+/* 2. Продвинутый: сумма по годам для сравнения с SQL. */
+SELECT {[Measures].[Internet Sales Amount]} ON COLUMNS,
+       [Date].[Calendar Year].[Calendar Year].Members ON ROWS
+FROM [Adventure Works];
+
+/* 3. Практический: под тестовой ролью должна остаться только разрешённая страна. */
+SELECT {[Measures].[Internet Sales Amount]} ON COLUMNS,
+       [Geography].[Country].[Country].Members ON ROWS
+FROM [Adventure Works]
+WHERE ([Geography].[Country].&[United States]);

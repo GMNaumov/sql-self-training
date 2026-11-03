@@ -1,0 +1,33 @@
+// DAX выполняется в SSAS Tabular 2014 с импортированными таблицами AdventureWorksDW.
+// 1. Простой: продажи по годам.
+EVALUATE
+SUMMARIZE(
+    FactInternetSales,
+    DimDate[CalendarYear],
+    "Sales Amount", SUM(FactInternetSales[SalesAmount])
+)
+ORDER BY DimDate[CalendarYear]
+
+// 2. Продвинутый: Top-N товаров по сумме продаж.
+EVALUATE
+TOPN(
+    5,
+    SUMMARIZE(
+        FactInternetSales,
+        DimProduct[EnglishProductName],
+        "Sales Amount", SUM(FactInternetSales[SalesAmount])
+    ),
+    [Sales Amount], 0
+)
+
+// 3. Практический: годовые продажи только категории Bikes.
+EVALUATE
+SUMMARIZE(
+    CALCULATETABLE(
+        FactInternetSales,
+        DimProductCategory[EnglishProductCategoryName] = "Bikes"
+    ),
+    DimDate[CalendarYear],
+    "Bikes Sales", SUM(FactInternetSales[SalesAmount])
+)
+ORDER BY DimDate[CalendarYear]

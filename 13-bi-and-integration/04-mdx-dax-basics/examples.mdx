@@ -1,0 +1,20 @@
+/* MDX выполняется в SSAS Multidimensional с развёрнутым кубом Adventure Works. */
+/* 1. Простой: мера на одной оси и годы на другой. */
+SELECT {[Measures].[Internet Sales Amount]} ON COLUMNS,
+       [Date].[Calendar Year].[Calendar Year].Members ON ROWS
+FROM [Adventure Works];
+
+/* 2. Продвинутый: TopCount и вычисляемая мера. */
+WITH MEMBER [Measures].[Sales Per Order] AS
+     IIF([Measures].[Internet Order Count] = 0, NULL,
+         [Measures].[Internet Sales Amount] / [Measures].[Internet Order Count])
+SELECT {[Measures].[Internet Sales Amount], [Measures].[Sales Per Order]} ON COLUMNS,
+       TOPCOUNT([Product].[Category].[Category].Members, 3,
+                [Measures].[Internet Sales Amount]) ON ROWS
+FROM [Adventure Works];
+
+/* 3. Практический: продажи велосипедов по годам. */
+SELECT {[Measures].[Internet Sales Amount]} ON COLUMNS,
+       [Date].[Calendar Year].[Calendar Year].Members ON ROWS
+FROM [Adventure Works]
+WHERE ([Product].[Category].&[Bikes]);

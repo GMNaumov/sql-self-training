@@ -1,0 +1,20 @@
+// Выполнять после processing табличной модели.
+// 1. Простой: контрольная сумма модели.
+EVALUATE
+ROW("Fact Rows", COUNTROWS(FactInternetSales),
+    "Sales Amount", SUM(FactInternetSales[SalesAmount]))
+
+// 2. Продвинутый: максимальная дата загруженных данных.
+EVALUATE
+ROW("Last Order Date Key", MAX(FactInternetSales[OrderDateKey]))
+
+// 3. Практический: эталон для роли с фильтром DimGeography[EnglishCountryRegionName] = "United States".
+EVALUATE
+CALCULATETABLE(
+    SUMMARIZE(
+        FactInternetSales,
+        DimGeography[EnglishCountryRegionName],
+        "Sales Amount", SUM(FactInternetSales[SalesAmount])
+    ),
+    DimGeography[EnglishCountryRegionName] = "United States"
+)

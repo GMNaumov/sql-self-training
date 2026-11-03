@@ -1,0 +1,16 @@
+/* Требуется многомерный куб AdventureWorksDW2014 с мерой Internet Sales Amount. */
+/* 1. Простой: участники уровня календарного года. */
+SELECT {[Measures].[Internet Sales Amount]} ON COLUMNS,
+       [Date].[Calendar Year].[Calendar Year].Members ON ROWS
+FROM [Adventure Works];
+
+/* 2. Продвинутый: дочерние элементы года по кварталам. */
+SELECT {[Measures].[Internet Sales Amount]} ON COLUMNS,
+       DESCENDANTS([Date].[Calendar Year].[Calendar Year].&[2013],
+                   [Date].[Calendar Year].[Calendar Quarter]) ON ROWS
+FROM [Adventure Works];
+
+/* 3. Практический: проверить атрибут страны в отчёте по продажам. */
+SELECT {[Measures].[Internet Sales Amount]} ON COLUMNS,
+       [Geography].[Country].[Country].Members ON ROWS
+FROM [Adventure Works];

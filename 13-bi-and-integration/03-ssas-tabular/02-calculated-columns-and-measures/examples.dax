@@ -1,0 +1,30 @@
+// DAX SQL Server 2014: без VAR и SUMMARIZECOLUMNS.
+// 1. Простой: мера общей суммы продаж.
+DEFINE
+    MEASURE FactInternetSales[Total Sales] = SUM(FactInternetSales[SalesAmount])
+EVALUATE
+SUMMARIZE(
+    FactInternetSales,
+    DimDate[CalendarYear],
+    "Sales Amount", FactInternetSales[Total Sales]
+)
+
+// 2. Продвинутый: CALCULATE меняет контекст фильтра.
+EVALUATE
+ADDCOLUMNS(
+    VALUES(DimDate[CalendarYear]),
+    "Bikes Sales", CALCULATE(
+        SUM(FactInternetSales[SalesAmount]),
+        DimProductCategory[EnglishProductCategoryName] = "Bikes"
+    )
+)
+
+// 3. Практический: доля года в общем итоге через ALL.
+EVALUATE
+ADDCOLUMNS(
+    SUMMARIZE(FactInternetSales, DimDate[CalendarYear]),
+    "Year Sales", CALCULATE(SUM(FactInternetSales[SalesAmount])),
+    "Percent Of Total",
+        CALCULATE(SUM(FactInternetSales[SalesAmount])) /
+        CALCULATE(SUM(FactInternetSales[SalesAmount]), ALL(DimDate))
+)

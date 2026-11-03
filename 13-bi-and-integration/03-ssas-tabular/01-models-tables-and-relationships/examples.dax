@@ -1,0 +1,21 @@
+// Требуется Tabular 2014 с таблицами FactInternetSales, DimDate и DimProduct.
+// 1. Простой: первые строки импортированного факта.
+EVALUATE
+TOPN(10, FactInternetSales, FactInternetSales[SalesOrderNumber], 1)
+
+// 2. Продвинутый: связь даты и факта используется при группировке.
+EVALUATE
+SUMMARIZE(
+    FactInternetSales,
+    DimDate[CalendarYear],
+    "Sales Amount", SUM(FactInternetSales[SalesAmount])
+)
+
+// 3. Практический: проверка суммы продаж по продуктам.
+EVALUATE
+SUMMARIZE(
+    FactInternetSales,
+    DimProduct[EnglishProductName],
+    "Sales Amount", SUM(FactInternetSales[SalesAmount])
+)
+ORDER BY [Sales Amount] DESC

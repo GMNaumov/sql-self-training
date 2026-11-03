@@ -1,0 +1,19 @@
+/* Имена мер должны соответствовать развёрнутому кубу Adventure Works. */
+/* 1. Простой: аддитивная мера по годам. */
+SELECT {[Measures].[Internet Sales Amount]} ON COLUMNS,
+       [Date].[Calendar Year].[Calendar Year].Members ON ROWS
+FROM [Adventure Works];
+
+/* 2. Продвинутый: вычисляемая мера среднего значения заказа. */
+WITH MEMBER [Measures].[Average Order Amount] AS
+     IIF([Measures].[Internet Order Count] = 0, NULL,
+         [Measures].[Internet Sales Amount] / [Measures].[Internet Order Count])
+SELECT {[Measures].[Internet Sales Amount], [Measures].[Average Order Amount]} ON COLUMNS,
+       [Date].[Calendar Year].[Calendar Year].Members ON ROWS
+FROM [Adventure Works];
+
+/* 3. Практический: продажи по категориям и годам. */
+SELECT [Date].[Calendar Year].[Calendar Year].Members ON COLUMNS,
+       [Product].[Category].[Category].Members ON ROWS
+FROM [Adventure Works]
+WHERE ([Measures].[Internet Sales Amount]);
